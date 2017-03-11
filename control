@@ -1,0 +1,10 @@
+Package: com.uroboro.ffs
+Name: ffs
+Depends:
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: A tiny text based filesystem.
+Maintainer: uroboro<uroboro.845@gmail.com>
+Author: uroboro<uroboro.845@gmail.com>
+Section: System
+Tag: role::hacker
