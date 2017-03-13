@@ -4,6 +4,7 @@
 #include <dirent.h> // struct dirent
 
 #include "fscod.h"
+#include "fscodec2.h" // fsize
 #include "fs_file_internal.h"
 
 int fsFilesAtPath_(fs_file * file, unsigned long long * offset) {
@@ -27,7 +28,13 @@ int fsFilesAtPath_(fs_file * file, unsigned long long * offset) {
 	file->subfiles = aux;
 
 	for (int idx = 0; idx < n; idx++) {
-		aux[idx] = fsNew(eps[idx]->d_name, file);
+		char * name = eps[idx]->d_name;
+		aux[idx] = fsNew(name, file);
+		{
+			char * filePath = fsFullFilePath(aux[idx]);
+			aux[idx]->size = fsize(filePath);
+			free(filePath);
+		}
 		aux[idx]->count = fsFilesAtPath_(aux[idx], offset);
 	}
 
@@ -41,7 +48,11 @@ fs_file * fsFilesAtPath(char * path) {
 		fprintf(stderr, "Error: NULL file\n");
 		return NULL;
 	}
-
+	{
+		char * filePath = fsFullFilePath(file);
+		file->size = fsize(filePath);
+		free(filePath);
+	}
 	file->count = fsFilesAtPath_(file, &offset);
 	return file;
 }

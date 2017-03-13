@@ -176,8 +176,6 @@ int fsDeserializeContents(unsigned char * buffer, long fileSize, long * contentO
 		return -1;
 	}
 
-	char * filePath = fsFullFilePath(file);
-	free(filePath);
 	if (file->count < 0) {
 		file->data = buffer + *contentOffset;
 		*contentOffset += file->size;
@@ -215,23 +213,4 @@ int fsDeserialize(unsigned char * buffer, long fileSize, fs_file * * file) {
 	*file = _file;
 
 	return 0;
-}
-
-fs_file * fsFilesInArchive(char * path) {
-	int r = 0;
-
-	off_t fileSize = fsize(path);
-	unsigned char * buffer = fsFileBufferFromFile(path, &fileSize);
-	if (!buffer) {
-		fprintf(stderr, "Error: Couldn't read full file <%s>\n", path);
-		return NULL;
-	}
-
-	fs_file * file = NULL;
-	if ((r = fsDeserialize(buffer, fileSize, &file)) != 0) {
-		fprintf(stderr, "Error: Couldn't deserialize buffer. Code %d\n", r);
-		return NULL;
-	}
-
-	return file;
 }

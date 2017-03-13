@@ -20,6 +20,8 @@ struct fs_file {
 	};
 };
 
+fs_file * root_fs_file;
+
 char * fs_popFileName(char * path, int8_t * offset);
 fs_file * fs_finddir(fs_file * file, char * path);
 int fs_countdir(fs_file * file);

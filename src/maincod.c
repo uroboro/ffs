@@ -1,6 +1,7 @@
 #include <stdio.h> // *printf, stderr
 
-#include "fscodec.h" // fsPrint, endswith
+#include "fscodec.h" // fsPrint
+#include "fscodec2.h" // endswith
 #include "fscod.h" // fsFilesAtPath, fsSerialize
 
 int main(int argc, char * * argv) {

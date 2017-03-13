@@ -23,12 +23,20 @@ RD_FILE * rd_fopen(char * filePath, char * mode) {
 }
 
 void rd_fclose(RD_FILE * stream) {
+	if (!stream) {
+		return;
+	}
+
 	stream->file = NULL;
 	stream->fpos = 0;
 	free(stream);
 }
 
 size_t rd_fread(void * ptr, size_t size, size_t nmemb, RD_FILE * stream) {
+	if (!stream) {
+		return EOF;
+	}
+
 	unsigned char * chbuf = (unsigned char *)ptr;
 	uint32_t sum = 0;
 	for (size_t i = 0; i < nmemb; i++) {
@@ -43,6 +51,10 @@ size_t rd_fread(void * ptr, size_t size, size_t nmemb, RD_FILE * stream) {
 }
 
 int rd_fgetc(RD_FILE * stream) {
+	if (!stream) {
+		return EOF;
+	}
+
 	uint8_t ch;
 	if (!fs_read(stream->file, stream->fpos++, 1, &ch) || (int8_t)ch == EOF) {
 		return EOF;
@@ -51,6 +63,10 @@ int rd_fgetc(RD_FILE * stream) {
 }
 
 char * rd_fgets(char * s, int size, RD_FILE * stream) {
+	if (!stream) {
+		return NULL;
+	}
+
 	char * cs = s;
 	int c;
 	while (--size > 0 && (c = rd_fgetc(stream)) != EOF) {

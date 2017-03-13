@@ -5,7 +5,7 @@
 #include "fsdec.h"
 #include "fs_file_internal.h"
 
-static fs_file * root_fs_file = NULL;
+fs_file * root_fs_file = NULL;
 
 char * fs_popFileName(char * path, int8_t * offset) {
 	if (!path || !offset) {
@@ -141,30 +141,11 @@ void fs_enumerateFile(fs_file * file, void (*f)(int, fs_file *, char *)) {
 	}
 }
 
-int pathTest(char * path) {
-	int length = strlen(path);
-	printf("%s (%d)\n", path, length);
-
-	int8_t offset = 0;
-	int8_t offsetdiff = 0;
-	char * a = NULL;
-	while ((a = fs_popFileName(&(path[offset]), &offsetdiff)) != NULL) {
-		printf("'%s'::", a);
-		offset += offsetdiff;
-		free(a);
-		if (!path[offset - 1]) {
-			break;
-		}
-	}
-	printf("\n");
-
-	return 0;
-}
-
-fs_file * fs_initrd_install(uint32_t location, uint32_t length) {
+fs_file * fsFilesAtLocation(uint32_t location, uint32_t length) {
 	int r = 0;
 	unsigned char * buffer = (unsigned char *)(unsigned long)location;
 	long fileSize = (long)length;
+
 	fs_file * file = NULL;
 	if ((r = fsDeserialize(buffer, fileSize, &file)) != 0) {
 		fprintf(stderr, "Error: Couldn't deserialize buffer. Code %d\n", r);
@@ -172,26 +153,4 @@ fs_file * fs_initrd_install(uint32_t location, uint32_t length) {
 	}
 
 	return file;
-}
-
-__attribute__((constructor))
-int ctor(int argc, char * * argv) {
-	char * path = (argc > 1) ? argv[1] : NULL;
-	if (!path) {
-		return 0;
-	}
-
-	while (endswith(path, "/")) {
-		path[strlen(path) - 1] = 0;
-	}
-
-	off_t fileSize = fsize(path);
-	unsigned char * buffer = fsFileBufferFromFile(path, &fileSize);
-	if (!buffer) {
-		fprintf(stderr, "Error: Couldn't read full file <%s>\n", path);
-		return 0;
-	}
-	root_fs_file = fs_initrd_install((uint32_t)buffer, (uint32_t)fileSize);
-
-	return 0;
 }
